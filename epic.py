@@ -1,24 +1,11 @@
 from hoshino import Service
-from PIL import Image
-from io import BytesIO
 import requests
 import time
 import os
-import base64
 
 sv = Service('epic喜加一')
 
 FILE_PATH = os.path.dirname(__file__)
-
-
-def imgtobase64(url: str):
-    r = requests.get(url)
-    open(FILE_PATH + '/temp.jpg', 'wb').write(r.content)
-    image = Image.open(os.path.join(FILE_PATH, 'temp.jpg'))
-    bio = BytesIO()
-    image.save(bio, format='JPEG')
-    base64_str = 'base64://' + base64.b64encode(bio.getvalue()).decode()
-    return f"[CQ:image,file={base64_str}]"
 
 
 def datetranslate(date):
@@ -35,7 +22,7 @@ async def epic(bot, ev):
     for i in range(len(data)):
         if data[i]['promotions'] is not None and len(data[i]['promotions']['promotionalOffers']) != 0:
             endDate = datetranslate(data[i]['promotions']['promotionalOffers'][0]['promotionalOffers'][0]['endDate'])
-            img = imgtobase64(data[i]['keyImages'][2]['url'])
+            img = '[CQ:image,file=' + data[i]['keyImages'][2]['url'] + ']'
             msg = data[i]['title'] + '\n截止时间：' + endDate + '\n─────────────\n' + img + '\n' + data[i]['description'] + '\n─────────────\nhttps://www.epicgames.com/store/zh-CN/p/' + data[i]['urlSlug']
             await bot.send(ev, msg)
             # elif len(data[i]['promotions']['upcomingPromotionalOffers']) != 0:
